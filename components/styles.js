@@ -2,6 +2,7 @@ import styled from "styled-components/native";
 import { View, Text, Image, TextInput, TouchableOpacity } from "react-native";
 import Constants from "expo-constants";
 
+
 const StatusBarHeight = Constants.statusBarHeight;
 
 export const colors = {
@@ -212,6 +213,7 @@ export const MsBox = styled.Text`
   font-size: 13px;
   margin-top: 10px;
   margin-bottom: 10px;
+  color: ${props => props.type == 'SUCCESS' ? green : red };
 `;
 
 //line
@@ -225,7 +227,7 @@ export const LineWithTextContainer = styled.View`
 export const LineText = styled.Text`
   margin-left: 10px;
   margin-right: 10px;
-  color: ${lightgray};
+  color: ${darklight};
   font-weight: bold;
 `;
 

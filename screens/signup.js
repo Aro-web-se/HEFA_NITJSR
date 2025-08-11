@@ -4,6 +4,9 @@ import { StatusBar } from 'expo-status-bar';
 // Formik
 import { Formik } from 'formik';
 
+//API
+import axios from 'axios';
+
 import KeyboardAvidWrap from '../components/KeybordAvoidwrapeup';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -32,9 +35,10 @@ import {
   TextLink,
   TextLinkContent,
   LineWithTextContainer,
+  MsBox
 } from './../components/styles';
 
-import { View, TouchableOpacity, Keyboard, Platform } from 'react-native';
+import { View, TouchableOpacity, Keyboard, Platform, ActivityIndicator } from 'react-native';
 
 // Colors
 const { brand, darklight, primary } = colors;
@@ -45,6 +49,12 @@ const Signup = ({ navigation }) => {
 
   const [show, setshow] = useState(false);
   const [date, setDate] = useState(new Date(2000, 1, 1));
+
+
+  const [message, setMessage] = useState();
+  const [messageType, setmessageType] = useState();
+
+
 
   // Actual date of birth
   const [dob, setdob] = useState();
@@ -59,6 +69,44 @@ const Signup = ({ navigation }) => {
   const showDatePicker = () => {
     setshow(true);
   };
+
+
+
+//From handling
+
+  const hendelMessage = (message, type = 'FAILED') => {
+    setMessage(message);
+    setmessageType(type);
+  }
+
+  const handelSignup = (crendentials, setSubmitting ) => {
+    hendelMessage(null);
+    const url ='http://localhost:3000/user/signup';
+
+    axios
+    .post(url, crendentials)
+    .then((response) => {
+      const result = response.data;
+      const {message, status , data} = result;
+
+
+      if(status != 'SUCCESS') {
+        hendelMessage(message, status);
+      }else{
+        navigation.navigate('Welcome', {...data});
+      }
+      setSubmitting(false);
+    })
+    .catch(error => {
+      console.log(error.JSON());
+      setSubmitting(false);
+      hendelMessage("you getting an error. please Check your network and try again");
+    })
+  }
+
+
+
+
 
   return (
     <KeyboardAvidWrap>
@@ -106,22 +154,38 @@ const Signup = ({ navigation }) => {
           )}
 
           <Formik
-            initialValues={{ fullName: '', email: '', dateOfBirth: '', password: '', confirmPassword: '' }}
-            onSubmit={(values) => {
-              console.log(values);
-              navigation.navigate('Login');
+            initialValues={{ name: '', email: '', dateOfBirth: '', password: '', confirmPassword: '' }}
+            onSubmit={(values, {setSubmitting}) => {
+
+              values = {...values, dateOfBirth: dob};
+
+
+              // console.log(values);
+              // navigation.navigate('Login');
+
+               
+             if (values.email == '' || values.password == '' || values.name == '' || values.dateOfBirth == '' || values.confirmPassword == ''){
+              hendelMessage("please fill all the fields");
+              setSubmitting(false);
+             }else if(values.password !== values.confirmPassword){
+              hendelMessage("Password do not match");
+              setSubmitting(false);
+
+             }else{
+              handelSignup(values, setSubmitting);
+             }
             }}
           >
-            {({ handleChange, handleBlur, handleSubmit, values }) => (
+            {({ handleChange, handleBlur, handleSubmit, values, isSubmitting }) => (
               <StyledFormArea>
                 <MyTextInput
                   label="Full Name"
                   icon="person"
                   placeholder="Your name"
                   placeholderTextColor={darklight}
-                  onChangeText={handleChange('fullName')}
-                  onBlur={handleBlur('fullName')}
-                  value={values.fullName}
+                  onChangeText={handleChange('name')}
+                  onBlur={handleBlur('name')}
+                  value={values.name}
                 />
 
                 <MyTextInput
@@ -181,14 +245,23 @@ const Signup = ({ navigation }) => {
                   onPress={Keyboard.dismiss}
                 />
 
-                <LineWithTextContainer>
-                  <Line />
-                </LineWithTextContainer>
-
+                <MsBox type={messageType}>{message}</MsBox>
+               { !isSubmitting && (
                 <StyledButton onPress={handleSubmit}>
                   <ButtonText> Signup </ButtonText>
                 </StyledButton>
+              )}
 
+                { isSubmitting && 
+                <StyledButton disabled = {true}>
+                  <ActivityIndicator size="large" color={primary} />
+                </StyledButton>}
+
+
+
+                <LineWithTextContainer>
+                  <Line />
+                </LineWithTextContainer>
                 <Extraview>
                   <ExtraText> Already have an account? </ExtraText>
                   <TextLink onPress={() => navigation.navigate('Login')}>
