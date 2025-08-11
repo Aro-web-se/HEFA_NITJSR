@@ -128,15 +128,15 @@ const Login = ({ navigation }) => {
             onSubmit={(values, {setSubmitting}) => {
 
 
-            //  if (values.email == '' || values.password == ''){
-            //   hendelMessage("please fill all the fields");
-            //   setSubmitting(false);
-            //  }else{
-            //   handelLogin(values, setSubmitting);
-            //  }
+             if (values.email == '' || values.password == ''){
+              hendelMessage("please fill all the fields");
+              setSubmitting(false);
+             }else{
+              handelLogin(values, setSubmitting);
+             }
 
-            console.log(values);
-              navigation.navigate('Welcome');
+            // console.log(values);
+            //   navigation.navigate('Welcome');
              }}
           >
             {({ handleChange, handleBlur, handleSubmit, values, isSubmitting }) => (
