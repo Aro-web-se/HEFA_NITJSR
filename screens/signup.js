@@ -9,6 +9,7 @@ import axios from 'axios';
 
 import KeyboardAvidWrap from '../components/KeybordAvoidwrapeup';
 
+//DatetimePicker
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 // Icons
@@ -35,7 +36,7 @@ import {
   TextLink,
   TextLinkContent,
   LineWithTextContainer,
-  MsBox
+  MsBox,
 } from './../components/styles';
 
 import { View, TouchableOpacity, Keyboard, Platform, ActivityIndicator } from 'react-native';
@@ -50,11 +51,8 @@ const Signup = ({ navigation }) => {
   const [show, setshow] = useState(false);
   const [date, setDate] = useState(new Date(2000, 1, 1));
 
-
   const [message, setMessage] = useState();
   const [messageType, setmessageType] = useState();
-
-
 
   // Actual date of birth
   const [dob, setdob] = useState();
@@ -70,43 +68,36 @@ const Signup = ({ navigation }) => {
     setshow(true);
   };
 
-
-
-//From handling
+  //From handling and Backend code
 
   const hendelMessage = (message, type = 'FAILED') => {
     setMessage(message);
     setmessageType(type);
-  }
+  };
 
-  const handelSignup = (crendentials, setSubmitting ) => {
+  const handelSignup = (crendentials, setSubmitting) => {
     hendelMessage(null);
-    const url ='http://localhost:3000/user/signup';
+    const url = 'http://localhost:3000/user/signup';
 
     axios
-    .post(url, crendentials)
-    .then((response) => {
-      const result = response.data;
-      const {message, status , data} = result;
+      .post(url, crendentials)
+      .then((response) => {
+        const result = response.data;
+        const { message, status, data } = result;
 
-
-      if(status != 'SUCCESS') {
-        hendelMessage(message, status);
-      }else{
-        navigation.navigate('Welcome', {...data});
-      }
-      setSubmitting(false);
-    })
-    .catch(error => {
-      console.log(error.JSON());
-      setSubmitting(false);
-      hendelMessage("you getting an error. please Check your network and try again");
-    })
-  }
-
-
-
-
+        if (status != 'SUCCESS') {
+          hendelMessage(message, status);
+        } else {
+          navigation.navigate('Welcome', { ...data });
+        }
+        setSubmitting(false);
+      })
+      .catch((error) => {
+        console.log(error.JSON());
+        setSubmitting(false);
+        hendelMessage('you getting an error. please Check your network and try again');
+      });
+  };
 
   return (
     <KeyboardAvidWrap>
@@ -155,25 +146,27 @@ const Signup = ({ navigation }) => {
 
           <Formik
             initialValues={{ name: '', email: '', dateOfBirth: '', password: '', confirmPassword: '' }}
-            onSubmit={(values, {setSubmitting}) => {
-
-              values = {...values, dateOfBirth: dob};
-
+            onSubmit={(values, { setSubmitting }) => {
+              values = { ...values, dateOfBirth: dob };
 
               // console.log(values);
               // navigation.navigate('Login');
 
-               
-             if (values.email == '' || values.password == '' || values.name == '' || values.dateOfBirth == '' || values.confirmPassword == ''){
-              hendelMessage("please fill all the fields");
-              setSubmitting(false);
-             }else if(values.password !== values.confirmPassword){
-              hendelMessage("Password do not match");
-              setSubmitting(false);
-
-             }else{
-              handelSignup(values, setSubmitting);
-             }
+              if (
+                values.email == '' ||
+                values.password == '' ||
+                values.name == '' ||
+                values.dateOfBirth == '' ||
+                values.confirmPassword == ''
+              ) {
+                hendelMessage('please fill all the fields');
+                setSubmitting(false);
+              } else if (values.password !== values.confirmPassword) {
+                hendelMessage('Password do not match');
+                setSubmitting(false);
+              } else {
+                handelSignup(values, setSubmitting);
+              }
             }}
           >
             {({ handleChange, handleBlur, handleSubmit, values, isSubmitting }) => (
@@ -246,18 +239,17 @@ const Signup = ({ navigation }) => {
                 />
 
                 <MsBox type={messageType}>{message}</MsBox>
-               { !isSubmitting && (
-                <StyledButton onPress={handleSubmit}>
-                  <ButtonText> Signup </ButtonText>
-                </StyledButton>
-              )}
+                {!isSubmitting && (
+                  <StyledButton onPress={handleSubmit}>
+                    <ButtonText> Signup </ButtonText>
+                  </StyledButton>
+                )}
 
-                { isSubmitting && 
-                <StyledButton disabled = {true}>
-                  <ActivityIndicator size="large" color={primary} />
-                </StyledButton>}
-
-
+                {isSubmitting && (
+                  <StyledButton disabled={true}>
+                    <ActivityIndicator size="large" color={primary} />
+                  </StyledButton>
+                )}
 
                 <LineWithTextContainer>
                   <Line />
@@ -287,7 +279,7 @@ const MyTextInput = ({ label, icon, isPassword, hidePassword, setHidePassword, i
 
       {!isDate && <StyledTextInput {...props} />}
       {isDate && (
-        <TouchableOpacity onPress={showDatePicker} >
+        <TouchableOpacity onPress={showDatePicker}>
           <StyledTextInput {...props} pointerEvents="none" />
         </TouchableOpacity>
       )}
