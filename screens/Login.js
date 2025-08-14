@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 // Formik
 import { Formik } from 'formik';
 
+//  KeyboardAvidWrap
 import KeyboardAvidWrap from '../components/KeybordAvoidwrapeup';
 
 // Icons
@@ -12,6 +13,7 @@ import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons';
 //API
 import axios from 'axios';
 
+//style
 import {
   StyledContainer,
   InnerContainer,
@@ -49,51 +51,38 @@ const { brand, darklight, primary } = colors;
 const Login = ({ navigation }) => {
   const [hidePassword, setHidePassword] = useState(true);
 
-
-
-
-
-
-
-
+  //Backend code
   const [message, setMessage] = useState();
   const [messageType, setmessageType] = useState();
 
   const hendelMessage = (message, type = 'FAILED') => {
     setMessage(message);
     setmessageType(type);
-  }
+  };
 
-  const handelLogin = (crendentials, setSubmitting ) => {
+  const handelLogin = (crendentials, setSubmitting) => {
     hendelMessage(null);
-    const url ='http://localhost:3000/user/signin';
+    const url = 'http://localhost:3000/user/signin';
 
     axios
-    .post(url, crendentials)
-    .then((response) => {
-      const result = response.data;
-      const {message, status , data} = result;
+      .post(url, crendentials)
+      .then((response) => {
+        const result = response.data;
+        const { message, status, data } = result;
 
-
-      if(status != 'SUCCESS') {
-        hendelMessage(message, status);
-      }else{
-        navigation.navigate('Welcome', {...data[0]});
-      }
-      setSubmitting(false);
-    })
-    .catch(error => {
-      console.log(error.JSON());
-      setSubmitting(false);
-      hendelMessage("you getting an error. please Check your network and try again");
-    })
-  }
-
-
-
-
-
-
+        if (status != 'SUCCESS') {
+          hendelMessage(message, status);
+        } else {
+          navigation.navigate('Welcome', { ...data[0] });
+        }
+        setSubmitting(false);
+      })
+      .catch((error) => {
+        console.log(error.JSON());
+        setSubmitting(false);
+        hendelMessage('you getting an error. please Check your network and try again');
+      });
+  };
 
   return (
     <KeyboardAvidWrap>
@@ -125,19 +114,17 @@ const Login = ({ navigation }) => {
 
           <Formik
             initialValues={{ email: '', password: '' }}
-            onSubmit={(values, {setSubmitting}) => {
+            onSubmit={(values, { setSubmitting }) => {
+              if (values.email == '' || values.password == '') {
+                hendelMessage('please fill all the fields');
+                setSubmitting(false);
+              } else {
+                handelLogin(values, setSubmitting);
+              }
 
-
-             if (values.email == '' || values.password == ''){
-              hendelMessage("please fill all the fields");
-              setSubmitting(false);
-             }else{
-              handelLogin(values, setSubmitting);
-             }
-
-            // console.log(values);
-            //   navigation.navigate('Welcome');
-             }}
+              // console.log(values);
+              //   navigation.navigate('Welcome');
+            }}
           >
             {({ handleChange, handleBlur, handleSubmit, values, isSubmitting }) => (
               <StyledFormArea>
@@ -170,23 +157,18 @@ const Login = ({ navigation }) => {
                   <TextLinkContent> Forgot Password </TextLinkContent>
                 </TextLink2>
 
-
-
                 <MsBox type={messageType}>{message}</MsBox>
-                { !isSubmitting && (
-                <StyledButton onPress={handleSubmit}>
-                  <ButtonText> Login </ButtonText>
-                </StyledButton>
-              )}
+                {!isSubmitting && (
+                  <StyledButton onPress={handleSubmit}>
+                    <ButtonText> Login </ButtonText>
+                  </StyledButton>
+                )}
 
-                { isSubmitting && 
-                <StyledButton disabled = {true}>
-                  <ActivityIndicator size="large" color={primary} />
-                </StyledButton>}
-
-
-
-
+                {isSubmitting && (
+                  <StyledButton disabled={true}>
+                    <ActivityIndicator size="large" color={primary} />
+                  </StyledButton>
+                )}
 
                 <LineWithTextContainer>
                   <Line />
